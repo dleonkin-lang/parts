@@ -78,7 +78,7 @@ const R=10,C=12,BR=14,BC=18,colors=["#2563eb","#f97316","#16a34a","#dc2626","#7c
 let data={folders:[],tasks:[]},activeFolder="all",activeTask=null,choosing=true,overlayOpen=false,split=45,offset={r:0,c:0},markByDisplay=new Map();
 let st={mode:"shape",shape:new Set,asg:new Map,p:[],sel:0,reveal:false,drag:null};
 const $=id=>document.getElementById(id),key=(r,c)=>r+","+c,xy=k=>k.split(",").map(Number),rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
-async function init(){try{data=await fetch("data/tasks.json").then(r=>r.json())}catch(e){$("cards").innerHTML='<div class="empty">Не удалось загрузить data/tasks.json</div>';return}renderCatalog();loadTask(data.tasks[0].id);setStage()}
+async function init(){try{let v=new URLSearchParams(location.search).get("v")||Date.now();data=await fetch("data/tasks.json?v="+encodeURIComponent(v),{cache:"no-store"}).then(r=>r.json())}catch(e){$("cards").innerHTML='<div class="empty">Не удалось загрузить data/tasks.json</div>';return}renderCatalog();loadTask(data.tasks[0].id);setStage()}
 function ensure(n){while(st.p.length<n){let i=st.p.length;st.p.push({name:"Часть "+(i+1),col:colors[i%colors.length],x:1,y:1,rot:0,flip:false})}while(st.p.length>n){let i=st.p.length-1;st.p.pop();[...st.asg].forEach(([k,v])=>{if(v==i)st.asg.delete(k)})}st.sel=Math.min(Math.max(st.sel,0),st.p.length-1)}
 function cells(i){let a=[];for(let k of st.shape)if(st.asg.get(k)===i){let [r,c]=xy(k);a.push({r,c})}return a}
 function norm(a){if(!a.length)return[];let mr=Math.min(...a.map(v=>v.r)),mc=Math.min(...a.map(v=>v.c));return a.map(v=>({r:v.r-mr,c:v.c-mc})).sort((a,b)=>a.r-b.r||a.c-b.c)}
